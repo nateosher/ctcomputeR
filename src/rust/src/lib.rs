@@ -1,12 +1,8 @@
 use ctcompute::{
-    duration::types::EnrollmentRate, error::CtcomputeErr, spending::types::SpendingFcn,
+    duration::types::EnrollmentRate, spending::types::SpendingFcn,
     trial::compute_trial::compute_trial, trial_characteristics::compute_ss_range::compute_ss_range,
 };
 use extendr_api::prelude::*;
-
-fn map_err(e: CtcomputeErr) -> extendr_api::Error {
-    extendr_api::Error::Other(format!("{e}"))
-}
 
 /// Computes characteristics of a clinical trial with specified
 /// power, sample size, etc.
@@ -28,44 +24,48 @@ fn ctcompute(
     maybe_custom_alpha_spend: Option<Vec<f64>>,
     r: usize,
     tol: f64,
-) -> extendr_api::Result<List> {
+) -> List {
     let maybe_lower_spending_fcn = match (
         maybe_lower_spending_fcn.as_deref(),
         maybe_custom_alpha_spend.as_deref(),
     ) {
-        (Some("LDOF"), _) => extendr_api::Result::Ok(Some(SpendingFcn::LDOF)),
-        (Some("custom"), Some(custom_alpha_spend)) => {
-            extendr_api::Result::Ok(Some(SpendingFcn::Custom {
-                cumulative_spend: custom_alpha_spend.into(),
-            }))
+        (Some("LDOF"), _) => Some(SpendingFcn::LDOF),
+        (Some("custom"), Some(custom_alpha_spend)) => Some(SpendingFcn::Custom {
+            cumulative_spend: custom_alpha_spend.into(),
+        }),
+        (None, _) => None,
+        (Some(unknown_spend), _) => {
+            extendr_api::throw_r_error(format!("invalid spending function: `{}`", unknown_spend))
         }
-        (None, _) => extendr_api::Result::Ok(None),
-        _ => extendr_api::Result::Err("invalid spending function".into()),
-    }?;
+    };
     let maybe_lower_spending_fcn_ref = maybe_lower_spending_fcn.as_ref();
 
     let maybe_upper_spending_fcn = match (
         maybe_upper_spending_fcn.as_deref(),
         maybe_custom_alpha_spend.as_deref(),
     ) {
-        (Some("LDOF"), _) => extendr_api::Result::Ok(Some(SpendingFcn::LDOF)),
-        (Some("custom"), Some(custom_alpha_spend)) => {
-            extendr_api::Result::Ok(Some(SpendingFcn::Custom {
-                cumulative_spend: custom_alpha_spend.into(),
-            }))
+        (Some("LDOF"), _) => Some(SpendingFcn::LDOF),
+        (Some("custom"), Some(custom_alpha_spend)) => Some(SpendingFcn::Custom {
+            cumulative_spend: custom_alpha_spend.into(),
+        }),
+        (None, _) => None,
+        (Some(unknown_spend), _) => {
+            extendr_api::throw_r_error(format!("invalid spending function: `{}`", unknown_spend))
         }
-        (None, _) => extendr_api::Result::Ok(None),
-        _ => extendr_api::Result::Err("invalid spending function".into()),
-    }?;
-
+    };
     let maybe_upper_spending_fcn_ref = maybe_upper_spending_fcn.as_ref();
 
     let maybe_look_fractions_ref = maybe_look_fractions.as_ref();
 
-    let enrollment_rate =
-        EnrollmentRate::new(enrollment_times, enrollment_rates).map_err(map_err)?;
+    let enrollment_rate = match EnrollmentRate::new(enrollment_times, enrollment_rates) {
+        Ok(er) => er,
+        Err(e) => {
+            rprintln!("");
+            extendr_api::throw_r_error(&e.to_string());
+        }
+    };
 
-    let ct = compute_trial(
+    let ct = match compute_trial(
         n_patients,
         alpha,
         power,
@@ -79,10 +79,15 @@ fn ctcompute(
         &enrollment_rate,
         r,
         tol,
-    )
-    .map_err(map_err)?;
+    ) {
+        Ok(ct) => ct,
+        Err(e) => {
+            rprintln!("");
+            extendr_api::throw_r_error(&e.to_string())
+        }
+    };
 
-    Ok(list!(
+    list!(
         accrual_duration = ct.accrual_duration,
         trial_duration = ct.trial_duration,
         n_events = ct.n_events,
@@ -93,7 +98,7 @@ fn ctcompute(
         h1_expected_trial_duration = ct.h1_expected_trial_duration,
         h0_expected_sample_size = ct.h0_expected_sample_size,
         h1_expected_sample_size = ct.h1_expected_sample_size,
-    ))
+    )
 }
 
 /// Computes range of sample sizes appropriate for given trial based on
@@ -150,10 +155,15 @@ pub fn ss_range(
 
     let maybe_look_fractions_ref = maybe_look_fractions.as_ref();
 
-    let enrollment_rate =
-        EnrollmentRate::new(enrollment_times, enrollment_rates).map_err(map_err)?;
+    let enrollment_rate = match EnrollmentRate::new(enrollment_times, enrollment_rates) {
+        Ok(er) => er,
+        Err(e) => {
+            rprintln!("");
+            extendr_api::throw_r_error(&e.to_string());
+        }
+    };
 
-    let ss_range_tup = compute_ss_range(
+    let ss_range_tup = match compute_ss_range(
         alpha,
         power,
         maybe_lower_spending_fcn_ref,
@@ -167,8 +177,13 @@ pub fn ss_range(
         tol,
         delta,
         min_perc_change,
-    )
-    .map_err(map_err)?;
+    ) {
+        Ok(ss_tup) => ss_tup,
+        Err(e) => {
+            rprintln!("");
+            extendr_api::throw_r_error(&e.to_string());
+        }
+    };
 
     Ok(vec![ss_range_tup.0, ss_range_tup.1])
 }
