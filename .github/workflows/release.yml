@@ -54,7 +54,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rextendr
+          extra-packages: any::rextendr, any::rcmdcheck, any::devtools
           needs: check
 
       - uses: actions/download-artifact@v4
