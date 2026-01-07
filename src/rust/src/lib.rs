@@ -6,6 +6,21 @@ use extendr_api::prelude::*;
 
 /// Computes characteristics of a clinical trial with specified
 /// power, sample size, etc.
+/// @param n_patients the number of patients in the hypothetical trial
+/// @param alpha one-sided type-I error rate
+/// @param power power of trial, i.e. 1 - type-II error rate
+/// @param maybe_lower_spending_fcn (optional) spending function type for lower bound
+/// @param maybe_upper_spending_fcn (optional) spending function type for upper bound
+/// @param maybe_look_fractions (optional) information fractions at each trial look
+/// @param prop_treated proportion of patients who will be randomized to treatment arm
+/// @param lambda_event_trt hazard rate for event for treatment arm (assuming constant hazard)
+/// @param lambda_event_ctrl hazard rate for event for control arm (assuming constant hazard)
+/// @param maybe_lambda_dropout (optional) hazard rate for dropout (assuming constant hazard)
+/// @param enrollment_rates rates at which patients will be enrolled into the study
+/// @param enrollment_times times at which enrollment rates apply
+/// @param maybe_custom_alpha_spend when spending functions are specified as "custom", specifies the *cumulative* alpha to be spent at each look
+/// @param r controls grid size for integration; recommended to be set to 32, and no less than 16 failing that
+/// @param tol desired precision of calculations. Results are not guaranteed to be within this distance of true values, but smaller tol values lead to more accurate calculations
 /// @export
 #[extendr]
 fn ctcompute(
@@ -33,6 +48,10 @@ fn ctcompute(
         (Some("custom"), Some(custom_alpha_spend)) => Some(SpendingFcn::Custom {
             cumulative_spend: custom_alpha_spend.into(),
         }),
+        (Some("custom"), None) => extendr_api::throw_r_error(String::from(
+            "`maybe_custom_alpha_spend` must be specified when \
+                maybe_lower_spending_fcn = 'custom'",
+        )),
         (None, _) => None,
         (Some(unknown_spend), _) => {
             extendr_api::throw_r_error(format!("invalid spending function: `{}`", unknown_spend))
@@ -48,6 +67,10 @@ fn ctcompute(
         (Some("custom"), Some(custom_alpha_spend)) => Some(SpendingFcn::Custom {
             cumulative_spend: custom_alpha_spend.into(),
         }),
+        (Some("custom"), None) => extendr_api::throw_r_error(String::from(
+            "`maybe_custom_alpha_spend` must be specified when \
+                maybe_upper_spending_fcn = 'custom'",
+        )),
         (None, _) => None,
         (Some(unknown_spend), _) => {
             extendr_api::throw_r_error(format!("invalid spending function: `{}`", unknown_spend))
@@ -103,6 +126,21 @@ fn ctcompute(
 
 /// Computes range of sample sizes appropriate for given trial based on
 /// heuristic of diminishing returns
+/// @param alpha one-sided type-I error rate
+/// @param power power of trial, i.e. 1 - type-II error rate
+/// @param maybe_lower_spending_fcn (optional) spending function type for lower bound
+/// @param maybe_upper_spending_fcn (optional) spending function type for upper bound
+/// @param maybe_look_fractions (optional) information fractions at each trial look
+/// @param prop_treated proportion of patients who will be randomized to treatment arm
+/// @param lambda_event_trt hazard rate for event for treatment arm (assuming constant hazard)
+/// @param lambda_event_ctrl hazard rate for event for control arm (assuming constant hazard)
+/// @param maybe_lambda_dropout (optional) hazard rate for dropout (assuming constant hazard)
+/// @param enrollment_rates rates at which patients will be enrolled into the study
+/// @param enrollment_times times at which enrollment rates apply
+/// @param maybe_custom_alpha_spend when spending functions are specified as "custom", specifies the *cumulative* alpha to be spent at each look
+/// @param tol desired precision of calculations. Results are not guaranteed to be within this distance of true values, but smaller tol values lead to more accurate calculations
+/// @param delta distance between points on grid of sample sizes to check; recommended to set to 1
+/// @param min_perc_change percent decrease in study duration per increment of sample size delta at which reductions are considered diminishing
 /// @export
 #[extendr]
 pub fn ss_range(
@@ -132,6 +170,10 @@ pub fn ss_range(
                 cumulative_spend: custom_alpha_spend.into(),
             }))
         }
+        (Some("custom"), None) => extendr_api::throw_r_error(String::from(
+            "`maybe_custom_alpha_spend` must be specified when \
+                maybe_lower_spending_fcn = 'custom'",
+        )),
         (None, _) => extendr_api::Result::Ok(None),
         _ => extendr_api::Result::Err("invalid spending function".into()),
     }?;
@@ -147,6 +189,10 @@ pub fn ss_range(
                 cumulative_spend: custom_alpha_spend.into(),
             }))
         }
+        (Some("custom"), None) => extendr_api::throw_r_error(String::from(
+            "`maybe_custom_alpha_spend` must be specified when \
+                maybe_upper_spending_fcn = 'custom'",
+        )),
         (None, _) => extendr_api::Result::Ok(None),
         _ => extendr_api::Result::Err("invalid spending function".into()),
     }?;

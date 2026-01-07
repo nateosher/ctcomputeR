@@ -12,11 +12,41 @@ NULL
 
 #' Computes characteristics of a clinical trial with specified
 #' power, sample size, etc.
+#' @param n_patients the number of patients in the hypothetical trial
+#' @param alpha one-sided type-I error rate
+#' @param power power of trial, i.e. 1 - type-II error rate
+#' @param maybe_lower_spending_fcn (optional) spending function type for lower bound
+#' @param maybe_upper_spending_fcn (optional) spending function type for upper bound
+#' @param maybe_look_fractions (optional) information fractions at each trial look
+#' @param prop_treated proportion of patients who will be randomized to treatment arm
+#' @param lambda_event_trt hazard rate for event for treatment arm (assuming constant hazard)
+#' @param lambda_event_ctrl hazard rate for event for control arm (assuming constant hazard)
+#' @param maybe_lambda_dropout (optional) hazard rate for dropout (assuming constant hazard)
+#' @param enrollment_rates rates at which patients will be enrolled into the study
+#' @param enrollment_times times at which enrollment rates apply
+#' @param maybe_custom_alpha_spend when spending functions are specified as "custom", specifies the *cumulative* alpha to be spent at each look
+#' @param r controls grid size for integration; recommended to be set to 32, and no less than 16 failing that
+#' @param tol desired precision of calculations. Results are not guaranteed to be within this distance of true values, but smaller tol values lead to more accurate calculations
 #' @export
 ctcompute <- function(n_patients, alpha, power, maybe_lower_spending_fcn, maybe_upper_spending_fcn, maybe_look_fractions, prop_treated, lambda_event_trt, lambda_event_ctrl, maybe_lambda_dropout, enrollment_rates, enrollment_times, maybe_custom_alpha_spend, r, tol) .Call(wrap__ctcompute, n_patients, alpha, power, maybe_lower_spending_fcn, maybe_upper_spending_fcn, maybe_look_fractions, prop_treated, lambda_event_trt, lambda_event_ctrl, maybe_lambda_dropout, enrollment_rates, enrollment_times, maybe_custom_alpha_spend, r, tol)
 
 #' Computes range of sample sizes appropriate for given trial based on
 #' heuristic of diminishing returns
+#' @param alpha one-sided type-I error rate
+#' @param power power of trial, i.e. 1 - type-II error rate
+#' @param maybe_lower_spending_fcn (optional) spending function type for lower bound
+#' @param maybe_upper_spending_fcn (optional) spending function type for upper bound
+#' @param maybe_look_fractions (optional) information fractions at each trial look
+#' @param prop_treated proportion of patients who will be randomized to treatment arm
+#' @param lambda_event_trt hazard rate for event for treatment arm (assuming constant hazard)
+#' @param lambda_event_ctrl hazard rate for event for control arm (assuming constant hazard)
+#' @param maybe_lambda_dropout (optional) hazard rate for dropout (assuming constant hazard)
+#' @param enrollment_rates rates at which patients will be enrolled into the study
+#' @param enrollment_times times at which enrollment rates apply
+#' @param maybe_custom_alpha_spend when spending functions are specified as "custom", specifies the *cumulative* alpha to be spent at each look
+#' @param tol desired precision of calculations. Results are not guaranteed to be within this distance of true values, but smaller tol values lead to more accurate calculations
+#' @param delta distance between points on grid of sample sizes to check; recommended to set to 1
+#' @param min_perc_change percent decrease in study duration per increment of sample size delta at which reductions are considered diminishing
 #' @export
 ss_range <- function(alpha, power, maybe_lower_spending_fcn, maybe_upper_spending_fcn, maybe_look_fractions, prop_treated, lambda_event_trt, lambda_event_ctrl, maybe_lambda_dropout, enrollment_rates, enrollment_times, maybe_custom_alpha_spend, tol, delta, min_perc_change) .Call(wrap__ss_range, alpha, power, maybe_lower_spending_fcn, maybe_upper_spending_fcn, maybe_look_fractions, prop_treated, lambda_event_trt, lambda_event_ctrl, maybe_lambda_dropout, enrollment_rates, enrollment_times, maybe_custom_alpha_spend, tol, delta, min_perc_change)
 

@@ -23,6 +23,37 @@ ss_range(
   min_perc_change
 )
 }
+\arguments{
+\item{alpha}{one-sided type-I error rate}
+
+\item{power}{power of trial, i.e. 1 - type-II error rate}
+
+\item{maybe_lower_spending_fcn}{(optional) spending function type for lower bound}
+
+\item{maybe_upper_spending_fcn}{(optional) spending function type for upper bound}
+
+\item{maybe_look_fractions}{(optional) information fractions at each trial look}
+
+\item{prop_treated}{proportion of patients who will be randomized to treatment arm}
+
+\item{lambda_event_trt}{hazard rate for event for treatment arm (assuming constant hazard)}
+
+\item{lambda_event_ctrl}{hazard rate for event for control arm (assuming constant hazard)}
+
+\item{maybe_lambda_dropout}{(optional) hazard rate for dropout (assuming constant hazard)}
+
+\item{enrollment_rates}{rates at which patients will be enrolled into the study}
+
+\item{enrollment_times}{times at which enrollment rates apply}
+
+\item{maybe_custom_alpha_spend}{when spending functions are specified as "custom", specifies the \emph{cumulative} alpha to be spent at each look}
+
+\item{tol}{desired precision of calculations. Results are not guaranteed to be within this distance of true values, but smaller tol values lead to more accurate calculations}
+
+\item{delta}{distance between points on grid of sample sizes to check; recommended to set to 1}
+
+\item{min_perc_change}{percent decrease in study duration per increment of sample size delta at which reductions are considered diminishing}
+}
 \description{
 Computes range of sample sizes appropriate for given trial based on
 heuristic of diminishing returns

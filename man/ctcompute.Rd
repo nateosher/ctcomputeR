@@ -23,6 +23,37 @@ ctcompute(
   tol
 )
 }
+\arguments{
+\item{n_patients}{the number of patients in the hypothetical trial}
+
+\item{alpha}{one-sided type-I error rate}
+
+\item{power}{power of trial, i.e. 1 - type-II error rate}
+
+\item{maybe_lower_spending_fcn}{(optional) spending function type for lower bound}
+
+\item{maybe_upper_spending_fcn}{(optional) spending function type for upper bound}
+
+\item{maybe_look_fractions}{(optional) information fractions at each trial look}
+
+\item{prop_treated}{proportion of patients who will be randomized to treatment arm}
+
+\item{lambda_event_trt}{hazard rate for event for treatment arm (assuming constant hazard)}
+
+\item{lambda_event_ctrl}{hazard rate for event for control arm (assuming constant hazard)}
+
+\item{maybe_lambda_dropout}{(optional) hazard rate for dropout (assuming constant hazard)}
+
+\item{enrollment_rates}{rates at which patients will be enrolled into the study}
+
+\item{enrollment_times}{times at which enrollment rates apply}
+
+\item{maybe_custom_alpha_spend}{when spending functions are specified as "custom", specifies the \emph{cumulative} alpha to be spent at each look}
+
+\item{r}{controls grid size for integration; recommended to be set to 32, and no less than 16 failing that}
+
+\item{tol}{desired precision of calculations. Results are not guaranteed to be within this distance of true values, but smaller tol values lead to more accurate calculations}
+}
 \description{
 Computes characteristics of a clinical trial with specified
 power, sample size, etc.

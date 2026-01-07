@@ -1,11 +1,10 @@
 Package: ctcomputeR
 Title: An R package for computing clinical trial characteristics
-Version: 0.0.1
+Version: 0.0.2
 Authors@R:
     person("Nate", "Osher", , "nateosher@gmail.com", role = c("aut", "cre"))
 Description: This package helps compute characteristics (necessary sample size, expected duration, etc.) of group sequential trials.
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
