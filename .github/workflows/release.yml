@@ -21,7 +21,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck, any::rextendr
+          extra-packages: any::rcmdcheck, any::rextendr, any::devtools
           needs: check
 
       # Optional but common if you're using roxygen / rextendr bindings generation
