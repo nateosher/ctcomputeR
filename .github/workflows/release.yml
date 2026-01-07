@@ -66,7 +66,7 @@ jobs:
         shell: pwsh
         run: |
           $tar = Get-ChildItem -Filter *.tar.gz | Select-Object -First 1
-          R CMD INSTALL --build $tar.Name
+          R.exe CMD INSTALL --build "$($tar.FullName)"
 
       - uses: actions/upload-artifact@v4
         with:
